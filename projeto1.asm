@@ -41,6 +41,7 @@ TITLE Alcides_19060987_PedroTrevisan_18016568
 ; -------------------------------------------------------------------- MACROS -----------------------------------------------------
 
 NewLine MACRO
+    ; to start beginning next line
     MOV DL, 10 
     MOV AH, 02h 
     INT 21h
@@ -50,10 +51,12 @@ NewLine MACRO
 ENDM
 
 CLICALL MACRO
+    ;display caracter
     MOV AH, 09
     LEA DX, CLIARROW
     INT 21h
 ENDM
+
 ; -------------------------------------------------------------------- MACROS -----------------------------------------------------
 
 ; ----------------------------------------------------------------- MAIN PROC -----------------------------------------------------
@@ -78,60 +81,70 @@ MAIN ENDP
 ;Function Name: introPrint
 ;Description: Funtion used only to print the program intro header
 introPrint PROC
+    ;display message
     MOV AH, 09
     LEA DX, BOUNDUP
     INT 21h
 
     NewLine
 
+    ;display message
     MOV AH, 09
     LEA DX, TITULO
     INT 21h
 
     NewLine
 
+    ;display message
     MOV AH, 09
     LEA DX, COMPS
     INT 21h
 
     NewLine
 
+    ;display message
     MOV AH, 09
     LEA DX, DIGITE
     INT 21h
 
     NewLine
 
+    ;display message
     MOV AH, 09
     LEA DX, CMDSOMA
     INT 21h
 
     NewLine
 
+    ;display message
     MOV AH, 09
     LEA DX, CMDSUB
     INT 21h
 
     NewLine
 
+    ;display message
     MOV AH, 09
     LEA DX, CMDMUL
     INT 21h
 
     NewLine
 
+    ;display message
     MOV AH, 09
     LEA DX, CMDDIV
     INT 21h
 
     NewLine
 
+    ;display message
     MOV AH, 09
     LEA DX, CMDEND
     INT 21h
 
     NewLine
 
+    ;display message
     MOV AH, 09
     LEA DX, BOUNDDOWN
     INT 21h
@@ -217,16 +230,22 @@ extDIV PROC
     JMP divFunction
 extDIV ENDP
 
-addFunction PROC
+extcheckNumber PROC
+    ;CMP AL, 0
+    ;JA checkNumberFuncion
+extcheckNumber ENDP
 
+addFunction PROC
     NewLine
 
+    ; display message
     MOV AH, 09
     LEA DX, ADDSELECT
     INT 21h
     
     NewLine
 
+    ; display message
     MOV AH, 09
     LEA DX, N1SELECT
     INT 21h
@@ -234,13 +253,26 @@ addFunction PROC
     NewLine
 
     CLICALL
-    
-    MOV AH, 1
+    ; read first number
+    MOV AH, 01
     INT 21H
+
+    ;verify number is larger than 0
+;    CMP AL, 0
+;    JL extcheckNumber
+
+    ;verify number is smaller than 9
+;    CMP AL, 9
+;    JG extcheckNumber
+    ; esta sendo entrando aqui sempre, nao sei pq
+
+    NewLine
+    ;if number is correct, store in BL
     MOV BL, AL
 
     NewLine
 
+    ;display message
     MOV AH, 09
     LEA DX, N2SELECT
     INT 21h
@@ -248,41 +280,71 @@ addFunction PROC
     NewLine
 
     CLICALL
-    
-    MOV AH, 1
+
+    ; read second number
+    MOV AH, 01
     INT 21H
+    MOV CL, AL
+
+    ;verify number is larger than 0
+;    CMP AL, 0
+;    JL extcheckNumber
+
+    ;verify number is smaller than 9
+;    CMP AL, 9
+;    JG extcheckNumber
+    ; esta sendo entrando aqui sempre, nao sei pq
+
+    ;if number is correct, store in BL
     MOV CL, AL
 
     NewLine
 
+    ;display message
     MOV AH, 09
     LEA DX, OPT
     INT 21h
 
-    MOV AH, 2
+    MOV AX, 10
+    MOV BL, 10
+    DIV BL
+
+    MOV BX, AX
     MOV DL, BL
-    INT 21H
     
+    OR DL, 30h
+    
+    ; write second number
+    MOV AH, 02
+    INT 21H
+
+    ;display caracter
     MOV AH,2
-	MOV DL, ' + '
-	INT 21H
-    
-    OR CL, 30h
-    MOV AH, 2
-    MOV DL, CL
+	MOV DL, 43 ; '+'
     INT 21H
+
+    MOV DL, BH
+    OR DL, 30h
+
+    ; write second number
+    MOV AH, 02
+    INT 21H   
     
     SUB BL, 30h
     SUB CL, 30h
+
+    ; operation
     ADD BL, CL
     
-    MOV AH,2
-	MOV DL, ' = '
+    ;display caracter
+    MOV AH, 02
+	MOV DL, 61 ; ' = '
 	INT 21H
 
     ADD BL, 30h
-
-    MOV AH, 2
+    
+    ;write second number
+    MOV AH, 02
     MOV DL, BL
     INT 21H
 
@@ -298,12 +360,14 @@ subFunction PROC
 
     NewLine
 
+    ; display message
     MOV AH, 09
-    LEA DX, SUBSELECT
+    LEA DX, ADDSELECT
     INT 21h
     
     NewLine
 
+    ; display message
     MOV AH, 09
     LEA DX, N1SELECT
     INT 21h
@@ -311,13 +375,26 @@ subFunction PROC
     NewLine
 
     CLICALL
-    
-    MOV AH, 1
+    ; read first number
+    MOV AH, 01
     INT 21H
+
+    ;verify number is larger than 0
+;    CMP AL, 0
+;    JL extcheckNumber
+
+    ;verify number is smaller than 9
+;    CMP AL, 9
+;    JG extcheckNumber
+    ; esta sendo entrando aqui sempre, nao sei pq
+
+    NewLine
+    ;if number is correct, store in BL
     MOV BL, AL
 
     NewLine
 
+    ;display message
     MOV AH, 09
     LEA DX, N2SELECT
     INT 21h
@@ -325,45 +402,74 @@ subFunction PROC
     NewLine
 
     CLICALL
-    
-    MOV AH, 1
+
+    ; read second number
+    MOV AH, 01
     INT 21H
+    MOV CL, AL
+
+    ;verify number is larger than 0
+;    CMP AL, 0
+;    JL extcheckNumber
+
+    ;verify number is smaller than 9
+;    CMP AL, 9
+;    JG extcheckNumber
+    ; esta sendo entrando aqui sempre, nao sei pq
+
+    ;if number is correct, store in BL
     MOV CL, AL
 
     NewLine
 
+    ;display message
     MOV AH, 09
     LEA DX, OPT
     INT 21h
 
-    MOV AH, 2
+    MOV AX, 10
+    MOV BL, 10
+    DIV BL
+
+    MOV BX, AX
     MOV DL, BL
-    INT 21H
     
-    MOV AH,2
-	MOV DL, ' - '
-	INT 21H
+    OR DL, 30h
     
-    OR CL, 30h
-    MOV AH, 2
-    MOV DL, CL
+    ; write second number
+    MOV AH, 02
     INT 21H
+
+    ;display caracter
+    MOV AH, 02
+	MOV DL, 43 ; '+'
+    INT 21H
+
+    MOV DL, BH
+    OR DL, 30h
+    
+    ; write second number
+    MOV AH, 02
+    INT 21H   
     
     SUB BL, 30h
     SUB CL, 30h
+
+    ; operation
     SUB BL, CL
     
-    MOV AH,2
-	MOV DL, ' = '
+    ;display caracter
+    MOV AH, 02
+	MOV DL, 61 ; ' = '
 	INT 21H
 
     ADD BL, 30h
-
-    MOV AH, 2
+    
+    ;write second number
+    MOV AH, 02
     MOV DL, BL
     INT 21H
 
-    ; NEED to print Negative Values
     ; ADD Call to print always 2 numbers
 
     NewLine
@@ -372,17 +478,270 @@ subFunction PROC
 subFunction ENDP
 
 mulFunction PROC
+    NewLine
+
+    ; display message
     MOV AH, 09
-    LEA DX, MULSELECT
+    LEA DX, ADDSELECT
     INT 21h
-    JMP receiveCheckOpt
+    
+    NewLine
+
+    ; display message
+    MOV AH, 09
+    LEA DX, N1SELECT
+    INT 21h
+
+    NewLine
+
+    CLICALL
+    ; read first number
+    MOV AH, 01
+    INT 21H
+
+    ;verify number is larger than 0
+;    CMP AL, 0
+;    JL extcheckNumber
+
+    ;verify number is smaller than 9
+;    CMP AL, 9
+;    JG extcheckNumber
+    ; esta sendo entrando aqui sempre, nao sei pq
+
+    NewLine
+    ;if number is correct, store in BL
+    MOV BL, AL
+
+    NewLine
+
+    ;display message
+    MOV AH, 09
+    LEA DX, N2SELECT
+    INT 21h
+
+    NewLine
+
+    CLICALL
+
+    ; read second number
+    MOV AH, 01
+    INT 21H
+    MOV CL, AL
+
+    ;verify number is larger than 0
+;    CMP AL, 0
+;    JL extcheckNumber
+
+    ;verify number is smaller than 9
+;    CMP AL, 9
+;    JG extcheckNumber
+    ; esta sendo entrando aqui sempre, nao sei pq
+
+    ;if number is correct, store in BL
+    MOV CL, AL
+
+    NewLine
+
+    ;display message
+    MOV AH, 09
+    LEA DX, OPT
+    INT 21h
+
+    MOV AX, 10
+    MOV BL, 10
+    DIV BL
+
+    MOV BX, AX
+    MOV DL, BL
+    
+    OR DL, 30h
+    
+    ; write second number
+    MOV AH, 02
+    INT 21H
+
+    ;display caracter
+    MOV AH, 02
+	MOV DL, 43 ; '+'
+    INT 21H
+
+    MOV DL, BH
+    OR DL, 30h
+    
+    ; write second number
+    MOV AH, 02
+    INT 21H   
+    
+    SUB BL, 30h
+    SUB CL, 30h
+
+    ; operation
+
+    ;store BL content in DL
+    MOV DL, BL
+
+    ; verify how much times mul BL
+    DIV DL, CL
+
+    ;shift to left is same MUL per 2
+    SHL BL, DL
+
+    ;verificar como colocar o resto, apenas multi por ele mesmo, porque seria no maximo mais 1 vezes que multiplicaria que o SHL nao abrange
+    
+    ;display caracter
+    MOV AH, 02
+	MOV DL, 61 ; ' = '
+	INT 21H
+
+    ADD BL, 30h
+    
+    ;write second number
+    MOV AH, 02
+    MOV DL, BL
+    INT 21H
+
+    ; ADD Call to print always 2 numbers
+
+    NewLine
+
+    JMP introPrint
 mulFunction ENDP
 
 divFunction PROC
+    NewLine
+
+    ; display message
     MOV AH, 09
-    LEA DX, DIVSELECT
+    LEA DX, ADDSELECT
     INT 21h
-    JMP receiveCheckOpt
+    
+    NewLine
+
+    ; display message
+    MOV AH, 09
+    LEA DX, N1SELECT
+    INT 21h
+
+    NewLine
+
+    CLICALL
+    ; read first number
+    MOV AH, 01
+    INT 21H
+
+    ;verify number is larger than 0
+;    CMP AL, 0
+;    JL extcheckNumber
+
+    ;verify number is smaller than 9
+;    CMP AL, 9
+;    JG extcheckNumber
+    ; esta sendo entrando aqui sempre, nao sei pq
+
+    NewLine
+    ;if number is correct, store in BL
+    MOV BL, AL
+
+    NewLine
+
+    ;display message
+    MOV AH, 09
+    LEA DX, N2SELECT
+    INT 21h
+
+    NewLine
+
+    CLICALL
+
+    ; read second number
+    MOV AH, 01
+    INT 21H
+    MOV CL, AL
+
+    ;verify number is larger than 0
+;    CMP AL, 0
+;    JL extcheckNumber
+
+    ;verify number is smaller than 9
+;    CMP AL, 9
+;    JG extcheckNumber
+    ; esta sendo entrando aqui sempre, nao sei pq
+
+    ;if number is correct, store in BL
+    MOV CL, AL
+
+    NewLine
+
+    ;display message
+    MOV AH, 09
+    LEA DX, OPT
+    INT 21h
+
+    MOV AX, 10
+    MOV BL, 10
+    DIV BL
+
+    MOV BX, AX
+    MOV DL, BL
+    
+    OR DL, 30h
+    
+    ; write second number
+    MOV AH, 02
+    INT 21H
+
+    ;display caracter
+    MOV AH, 02
+	MOV DL, 43 ; '+'
+    INT 21H
+
+    MOV DL, BH
+    OR DL, 30h
+    
+    ; write second number
+    MOV AH, 02
+    INT 21H   
+    
+    SUB BL, 30h
+    SUB CL, 30h
+
+    ; operation
+    ;store BL content in DL
+    MOV DL, BL
+
+    ; verify how much times mul BL
+    DIV DL, CL
+
+    ;shift to right is same DIV per 2
+    SHR BL, DL
+
+    ;verificar como colocar o resto, apenas multi por ele mesmo, porque seria no maximo mais 1 vezes que multiplicaria que o SHL nao abrange
+    
+    ;display caracter
+    MOV AH, 02
+	MOV DL, 61 ; ' = '
+	INT 21H
+
+    ADD BL, 30h
+    
+    ;write second number
+    MOV AH, 02
+    MOV DL, BL
+    INT 21H
+
+    ; ADD Call to print always 2 numbers
+
+    NewLine
+
+    JMP introPrint
 divFunction ENDP
 
+checkNumberFuncion PROC
+    MOV AH, 02
+	MOV DL, 81 ; 'Q '
+	INT 21H
+
+    ; apenas para teste
+    ;JMP introPrint
+checkNumberFuncion ENDP
 End MAIN
