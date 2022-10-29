@@ -1,8 +1,7 @@
 ; TO DO LIST
-; ADD PRINT 2 Numbers
-; PRINT NEGATIVE NUMBERS
-; DEVELOP MUL FUNCTION
-; DEVELOP DIV FUNCTION
+; verificar operacao de Multiplicacao e divisao, olhar comentarios
+; copiei a ft que enviou no whats pra imprimir os numeros, mas so o primeiro esta imprimindo certo
+; verificação de numeros esta sendo estando dando errado quando verifica se é maior que 9
 
 TITLE Alcides_19060987_PedroTrevisan_18016568
 .MODEL SMALL
@@ -578,13 +577,15 @@ mulFunction PROC
     ; operation
 
     ;store BL content in DL
-    MOV DL, BL
+    MOV DL, CL
 
     ; verify how much times mul BL
-    DIV DL, CL
+    ;DIV DX, 2
+    ;erro: extra chacarters on line
 
     ;shift to left is same MUL per 2
-    SHL BL, DL
+    ;SHL BL, DL
+    ; erro: rotate count must be constant or CL, pq so CL?
 
     ;verificar como colocar o resto, apenas multi por ele mesmo, porque seria no maximo mais 1 vezes que multiplicaria que o SHL nao abrange
     
@@ -706,14 +707,17 @@ divFunction PROC
     SUB CL, 30h
 
     ; operation
-    ;store BL content in DL
-    MOV DL, BL
+    ;store CL content in DL
+    MOV DL, CL
 
     ; verify how much times mul BL
-    DIV DL, CL
+    ;DIV DL, 2
+        ;erro: extra chacarters on line
+
 
     ;shift to right is same DIV per 2
-    SHR BL, DL
+    ;SHR BL, DL
+        ; erro: rotate count must be constant or CL, pq so CL?
 
     ;verificar como colocar o resto, apenas multi por ele mesmo, porque seria no maximo mais 1 vezes que multiplicaria que o SHL nao abrange
     
