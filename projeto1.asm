@@ -1,7 +1,8 @@
 ; TO DO LIST
-; verificar operacao de Multiplicacao e divisao, olhar comentarios
-; copiei a ft que enviou no whats pra imprimir os numeros, mas so o primeiro esta imprimindo certo
-; verificação de numeros esta sendo estando dando errado quando verifica se é maior que 9 -> Erro era que e
+; Print Negativo na Subtração
+; MUL
+; DIV
+; Print 2 digitos
 
 TITLE Alcides_19060987_PedroTrevisan_18016568
 .MODEL SMALL
@@ -29,12 +30,13 @@ TITLE Alcides_19060987_PedroTrevisan_18016568
     DIVSELECT   DB "Funcao de Divisao Selecionada $"
     N1SELECT    DB "Selecione o primeiro numero (0 - 9) $"
     N2SELECT    DB "Selecione o segundo numero (0 - 9) $"
+    BACKINTRO   DB "Pressione ENTER para Contiuar $"
 
     OPT         DB "Operacao -> $"
 
     ;Errors Messages
     INVOPT      DB "Opcao Invalida. Tente Novamente $"
-    INVINPT     DB "Entrada Inválida. Tente Novamente $"
+    INVINPT     DB "Entrada Invalida. Tente Novamente $"
 
 .CODE
 
@@ -263,10 +265,10 @@ readN1 PROC
     INT 21H
 
     CMP AL, 30h
-    JB Error
+    JB ErrorN1
 
     CMP AL, 39h
-    JA Error
+    JA ErrorN1
 
     MOV BL, AL
 
@@ -299,10 +301,10 @@ readN2 PROC
     INT 21H
 
     CMP AL, 30h
-    JB Error
+    JB ErrorN2
 
     CMP AL, 39h
-    JA Error
+    JA ErrorN2
 
     MOV CL, AL
 
@@ -351,20 +353,20 @@ addFunction PROC
     INT 21H
     
     MOV AH,2
-	MOV DL, ' + '
+	MOV DL, "+"
 	INT 21H
     
     MOV AH, 2
     MOV DL, CL
     INT 21H
     
-    AND BL, 30h
-    AND CL, 30h
+    SUB BL, 30h
+    SUB CL, 30h
 
     ADD BL, CL
     
     MOV AH,2
-	MOV DL, ' = '
+	MOV DL, "="
 	INT 21H
 
     ADD BL, 30h
@@ -376,6 +378,13 @@ addFunction PROC
     ; ADD Call to print always 2 numbers
 
     NewLine
+
+    MOV AH, 09
+    LEA DX, BACKINTRO
+    INT 21h
+
+    MOV AH, 1
+    INT 21H
 
     JMP introPrint
 
@@ -404,7 +413,7 @@ subFunction PROC
     NewLine
 
     ;display message
-     MOV AH, 09
+    MOV AH, 09
     LEA DX, OPT
     INT 21h
 
@@ -413,19 +422,19 @@ subFunction PROC
     INT 21H
     
     MOV AH,2
-	MOV DL, ' - '
+	MOV DL, "-"
 	INT 21H
     
     MOV AH, 2
     MOV DL, CL
     INT 21H
     
-    AND BL, 30h
-    AND CL, 30h
+    SUB BL, 30h
+    SUB CL, 30h
     SUB BL, CL
     
     MOV AH,2
-	MOV DL, ' = '
+	MOV DL, "="
 	INT 21H
 
     ADD BL, 30h
@@ -438,6 +447,13 @@ subFunction PROC
     ; ADD Call to print always 2 numbers
 
     NewLine
+
+    MOV AH, 09
+    LEA DX, BACKINTRO
+    INT 21h
+
+    MOV AH, 1
+    INT 21H
 
     JMP introPrint
 
@@ -492,7 +508,7 @@ divFunction PROC
     MOV AH, 09
     LEA DX, OPT
     INT 21h
-    
+
 divFunction ENDP
 
 End MAIN
