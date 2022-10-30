@@ -1,8 +1,7 @@
 ; TO DO LIST
-; ADD PRINT 2 Numbers
-; PRINT NEGATIVE NUMBERS
-; DEVELOP MUL FUNCTION
-; DEVELOP DIV FUNCTION
+; verificar operacao de Multiplicacao e divisao, olhar comentarios
+; copiei a ft que enviou no whats pra imprimir os numeros, mas so o primeiro esta imprimindo certo
+; verificação de numeros esta sendo estando dando errado quando verifica se é maior que 9 -> Erro era que e
 
 TITLE Alcides_19060987_PedroTrevisan_18016568
 .MODEL SMALL
@@ -35,12 +34,14 @@ TITLE Alcides_19060987_PedroTrevisan_18016568
 
     ;Errors Messages
     INVOPT      DB "Opcao Invalida. Tente Novamente $"
+    INVINPT     DB "Entrada Inválida. Tente Novamente $"
 
 .CODE
 
 ; -------------------------------------------------------------------- MACROS -----------------------------------------------------
 
 NewLine MACRO
+    ; to start beginning next line
     MOV DL, 10 
     MOV AH, 02h 
     INT 21h
@@ -50,10 +51,12 @@ NewLine MACRO
 ENDM
 
 CLICALL MACRO
+    ;display caracter
     MOV AH, 09
     LEA DX, CLIARROW
     INT 21h
 ENDM
+
 ; -------------------------------------------------------------------- MACROS -----------------------------------------------------
 
 ; ----------------------------------------------------------------- MAIN PROC -----------------------------------------------------
@@ -77,61 +80,77 @@ MAIN ENDP
 
 ;Function Name: introPrint
 ;Description: Funtion used only to print the program intro header
+;Register used: None
 introPrint PROC
+
+    ; Clear the screen
+    MOV AX,3H			
+	INT 10H	
+
+    ;display message
     MOV AH, 09
     LEA DX, BOUNDUP
     INT 21h
 
     NewLine
 
+    ;display message
     MOV AH, 09
     LEA DX, TITULO
     INT 21h
 
     NewLine
 
+    ;display message
     MOV AH, 09
     LEA DX, COMPS
     INT 21h
 
     NewLine
 
+    ;display message
     MOV AH, 09
     LEA DX, DIGITE
     INT 21h
 
     NewLine
 
+    ;display message
     MOV AH, 09
     LEA DX, CMDSOMA
     INT 21h
 
     NewLine
 
+    ;display message
     MOV AH, 09
     LEA DX, CMDSUB
     INT 21h
 
     NewLine
 
+    ;display message
     MOV AH, 09
     LEA DX, CMDMUL
     INT 21h
 
     NewLine
 
+    ;display message
     MOV AH, 09
     LEA DX, CMDDIV
     INT 21h
 
     NewLine
 
+    ;display message
     MOV AH, 09
     LEA DX, CMDEND
     INT 21h
 
     NewLine
 
+    ;display message
     MOV AH, 09
     LEA DX, BOUNDDOWN
     INT 21h
@@ -141,7 +160,9 @@ introPrint PROC
     RET
 introPrint ENDP
 
-;description
+;Function Name: receiveCheckOpt
+;Description: Funtion used to get what operation user wants to do
+;Register used: None
 receiveCheckOpt PROC
     
     CLICALL
@@ -217,15 +238,18 @@ extDIV PROC
     JMP divFunction
 extDIV ENDP
 
-addFunction PROC
+extcheckNumber PROC
+    ;CMP AL, 0
+    ;JA checkNumberFuncion
+extcheckNumber ENDP
 
-    NewLine
+; ----------------------------------------------------------------- Extend Functions -----------------------------------------------------
 
-    MOV AH, 09
-    LEA DX, ADDSELECT
-    INT 21h
-    
-    NewLine
+; ----------------------------------------------------------------- Commom Functions -----------------------------------------------------
+;Function Name: readN1
+;Description: Funtion used read the first number that we gonna used on the operation
+;Register used: BL used for store the number read
+readN1 PROC
 
     MOV AH, 09
     LEA DX, N1SELECT
@@ -237,9 +261,31 @@ addFunction PROC
     
     MOV AH, 1
     INT 21H
+
+    CMP AL, 30h
+    JB Error
+
+    CMP AL, 39h
+    JA Error
+
     MOV BL, AL
 
+    RET
+
+ErrorN1:
     NewLine
+    MOV AH, 09
+    LEA DX, INVINPT
+    INT 21h
+    NewLine
+    JMP readN1
+
+readN1 ENDP
+
+;Function Name: readN2
+;Description: Funtion used read the second number that we gonna used on the operation
+;Register used: CL used for store the number read
+readN2 PROC
 
     MOV AH, 09
     LEA DX, N2SELECT
@@ -251,7 +297,48 @@ addFunction PROC
     
     MOV AH, 1
     INT 21H
+
+    CMP AL, 30h
+    JB Error
+
+    CMP AL, 39h
+    JA Error
+
     MOV CL, AL
+
+    RET
+
+ErrorN2:
+    NewLine
+    MOV AH, 09
+    LEA DX, INVINPT
+    INT 21h
+    NewLine
+    JMP readN2
+
+readN2 ENDP
+; ----------------------------------------------------------------- Commom Functions -----------------------------------------------------
+
+; ----------------------------------------------------------------- Math Functions -----------------------------------------------------
+;Function Name: addFunction
+;Description: Funtion used to do the sum
+;Register used: BL as First Input and CL as Second Input
+addFunction PROC
+
+    NewLine
+
+    ; Print Msg for the operation selected
+    MOV AH, 09
+    LEA DX, ADDSELECT
+    INT 21h
+    
+    NewLine
+
+    call readN1
+
+    NewLine
+
+    call readN2
 
     NewLine
 
@@ -267,13 +354,13 @@ addFunction PROC
 	MOV DL, ' + '
 	INT 21H
     
-    OR CL, 30h
     MOV AH, 2
     MOV DL, CL
     INT 21H
     
-    SUB BL, 30h
-    SUB CL, 30h
+    AND BL, 30h
+    AND CL, 30h
+
     ADD BL, CL
     
     MOV AH,2
@@ -294,45 +381,30 @@ addFunction PROC
 
 addFunction ENDP
 
+;Function Name: subFunction
+;Description: Funtion used to do the subtraction
+;Register used: BL as First Input and CL as Second Input
 subFunction PROC
 
     NewLine
 
+    ; display message
     MOV AH, 09
     LEA DX, SUBSELECT
     INT 21h
     
     NewLine
 
-    MOV AH, 09
-    LEA DX, N1SELECT
-    INT 21h
+    call readN1
 
     NewLine
 
-    CLICALL
-    
-    MOV AH, 1
-    INT 21H
-    MOV BL, AL
+    call readN2
 
     NewLine
 
-    MOV AH, 09
-    LEA DX, N2SELECT
-    INT 21h
-
-    NewLine
-
-    CLICALL
-    
-    MOV AH, 1
-    INT 21H
-    MOV CL, AL
-
-    NewLine
-
-    MOV AH, 09
+    ;display message
+     MOV AH, 09
     LEA DX, OPT
     INT 21h
 
@@ -344,13 +416,12 @@ subFunction PROC
 	MOV DL, ' - '
 	INT 21H
     
-    OR CL, 30h
     MOV AH, 2
     MOV DL, CL
     INT 21H
     
-    SUB BL, 30h
-    SUB CL, 30h
+    AND BL, 30h
+    AND CL, 30h
     SUB BL, CL
     
     MOV AH,2
@@ -369,20 +440,59 @@ subFunction PROC
     NewLine
 
     JMP introPrint
+
 subFunction ENDP
 
 mulFunction PROC
+
+    NewLine
+
+    ; display message
     MOV AH, 09
     LEA DX, MULSELECT
     INT 21h
-    JMP receiveCheckOpt
+    
+    NewLine
+
+    call readN1
+
+    NewLine
+
+    call readN2
+
+    NewLine
+
+    ;display message
+    MOV AH, 09
+    LEA DX, OPT
+    INT 21h
+
 mulFunction ENDP
 
 divFunction PROC
+
+     NewLine
+
+    ; display message
     MOV AH, 09
     LEA DX, DIVSELECT
     INT 21h
-    JMP receiveCheckOpt
+    
+    NewLine
+
+    call readN1
+
+    NewLine
+
+    call readN2
+
+    NewLine
+
+    ;display message
+    MOV AH, 09
+    LEA DX, OPT
+    INT 21h
+    
 divFunction ENDP
 
 End MAIN
