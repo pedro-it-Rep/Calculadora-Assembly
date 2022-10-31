@@ -1,8 +1,7 @@
 ; TO DO LIST
 ; Print Negativo na Subtração
-; MUL
+; MUL -> Necessario Terminar
 ; DIV
-; Print 2 digitos
 
 TITLE Alcides_19060987_PedroTrevisan_18016568
 .MODEL SMALL
@@ -369,13 +368,8 @@ addFunction PROC
 	MOV DL, "="
 	INT 21H
 
-    ADD BL, 30h
-
-    MOV AH, 2
-    MOV DL, BL
-    INT 21H
-
-    ; ADD Call to print always 2 numbers
+    ; Function used to print always 2 digits
+    JMP printNum
 
     NewLine
 
@@ -437,14 +431,10 @@ subFunction PROC
 	MOV DL, "="
 	INT 21H
 
-    ADD BL, 30h
-
-    MOV AH, 2
-    MOV DL, BL
-    INT 21H
+    ; Function used to print always 2 digits
+    JMP printNum
 
     ; NEED to print Negative Values
-    ; ADD Call to print always 2 numbers
 
     NewLine
 
@@ -459,6 +449,9 @@ subFunction PROC
 
 subFunction ENDP
 
+;Function Name: mulFunction
+;Description: Funtion used to do the mul operation
+;Register used: BX = A, CX = B, DX = A*B
 mulFunction PROC
 
     NewLine
@@ -482,6 +475,26 @@ mulFunction PROC
     MOV AH, 09
     LEA DX, OPT
     INT 21h
+
+; AINDA NÃO ESTÁ PRONTO, NECESSARIO TERMINAR DE COLOCAR OS REGISTRADORES CORRETOS
+    PUSH AX
+    PUSH BX    ;salva os conteudos de AX e BX
+    AND DX,0    ;inicializa DX em 0
+    ;repeat  if B eh impar
+TOPO:   
+    TEST BX,1 ;LSB de BX = 1?
+    JZ PT1       ;nao, (LSB = 0)
+    ;then
+    ADD DX,AX   ;sim, entao
+    ;produto = produto + A
+    ;end_if
+PT1:    
+    SHL AX,1        ;desloca A para a esquerda 1 bit
+    SHR BX,1       ;desloca B para a direita 1 bit
+    ;until
+    JNZ TOPO      ;fecha o loop repeat
+    POP BX
+    POP AX          ;restaura os conteudos de BX e AX
 
 mulFunction ENDP
 
@@ -510,5 +523,23 @@ divFunction PROC
     INT 21h
 
 divFunction ENDP
+
+;description
+printNum PROC
+    MOV AX, BX
+    MOV BL, 10
+    DIV BL
+    MOV BX, AX
+    MOV DL, BL
+    OR DL, 30h
+    MOV AH,2
+    INT 21H
+    MOV DL, BH
+    OR DL, 30h
+    MOV AH, 2
+    INT 21h
+
+    RET
+printNum ENDP
 
 End MAIN
