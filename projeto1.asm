@@ -209,7 +209,7 @@ receiveCheckOpt PROC
     ; CMP X or x -> in program we accept both
     CMP BL, 58h
     JE extEnd
-    
+
     ;escrever comentario
     CMP BL, 78h
     JE extEnd
@@ -246,11 +246,6 @@ extDIV PROC
     JMP divFunction
 extDIV ENDP
 
-extcheckNumber PROC
-    ;CMP AL, 0
-    ;JA checkNumberFuncion
-extcheckNumber ENDP
-
 ; ----------------------------------------------------------------- Extend Functions -----------------------------------------------------
 
 ; ----------------------------------------------------------------- Commom Functions -----------------------------------------------------
@@ -266,18 +261,21 @@ readN1 PROC
     NewLine
 
     CLICALL
-
+    
     ; read caracter
     MOV AH, 1
     INT 21H
 
-    ;verify number is less than 0
+;verify number is less than 0
     CMP AL, 30h
     JB ErrorN1
 
     ;verify number is more than 9
     CMP AL, 39h
     JA ErrorN1
+
+    TEST AL, 80h
+    JNZ Negative_1
 
     MOV BL, AL
 
@@ -294,6 +292,12 @@ ErrorN1:
     NewLine
 
     JMP readN1
+
+Negative_1:
+    MOV AH, 02
+    MOV DL, "-"
+    INT 21h
+    RET
 
 readN1 ENDP
 
@@ -315,12 +319,15 @@ readN2 PROC
     INT 21H
 
     ;verify number is less than 0
-    CMP AL, 30h 
+    CMP AL, 30h
     JB ErrorN2
 
     ;verify number is more than 9
     CMP AL, 39h
     JA ErrorN2
+
+    TEST AL, 80h
+    JNZ Negative_2
 
     MOV CL, AL
 
@@ -337,6 +344,12 @@ ErrorN2:
     NewLine
 
     JMP readN2
+
+Negative_2:
+    MOV AH, 02
+    MOV DL, "-"
+    INT 21h
+    RET
 
 readN2 ENDP
 ; ----------------------------------------------------------------- Commom Functions -----------------------------------------------------
@@ -369,10 +382,6 @@ addFunction PROC
     LEA DX, OPT
     INT 21h
 
-    ;verify number is negative
-    TEST BL, 80h
-    JNZ NegativeNumber_1
-
     ;write caracter
     MOV AH, 2
     MOV DL, BL
@@ -383,22 +392,16 @@ addFunction PROC
 	MOV DL, "+"
 	INT 21H
     
-    ;verify number is negative
-    TEST CL, 80h
-    JNZ NegativeNumber_1
-
-
-    ;write caracter
     MOV AH, 2
     MOV DL, CL
     INT 21H
-
+    
     ;escrever comentario
     SUB BL, 30h
     SUB CL, 30h
 
     ADD BL, CL
-
+    
     ;write caracter
     MOV AH,2
 	MOV DL, "="
@@ -419,12 +422,6 @@ addFunction PROC
     INT 21H
 
     JMP introPrint
-
-NegativeNumber_1:
-        ; write caratcer
-        MOV AH,2
-	    MOV DL, "-"
-	    INT 21H
 
 addFunction ENDP
 
@@ -455,11 +452,6 @@ subFunction PROC
     LEA DX, OPT
     INT 21h
 
-    ;verify number is negative
-    TEST BL, 80h
-    JNZ NegativeNumber_2
-
-    ;write caracter
     MOV AH, 2
     MOV DL, BL
     INT 21H
@@ -468,23 +460,10 @@ subFunction PROC
     MOV AH,2
 	MOV DL, "-"
 	INT 21H
-
-    MOV AH,2
-	MOV DL, "("
-	INT 21H
     
-    ;verify number is negative
-    TEST CL, 80h
-    JNZ NegativeNumber_2
-
-    ;write caracter
     MOV AH, 2
     MOV DL, CL
     INT 21H
-
-    MOV AH,2
-	MOV DL, ")"
-	INT 21H
     
     ;escrever comentario
     SUB BL, 30h
@@ -511,13 +490,6 @@ subFunction PROC
     INT 21H
 
     JMP introPrint
-
-NegativeNumber_2:
-        ; write caratcer
-        MOV AH,2
-	    MOV DL, "-"
-	    INT 21H
-        RET
 
 subFunction ENDP
 
@@ -548,15 +520,6 @@ mulFunction PROC
     LEA DX, OPT
     INT 21h
 
-    ;verify number is negative
-    TEST BL, 80h
-    JNZ NegativeNumber_3
-
-    ;verify number is negative
-    TEST CL, 80h
-    JNZ NegativeNumber_3
-
-
 ; AINDA NÃO ESTÁ PRONTO, NECESSARIO TERMINAR DE COLOCAR OS REGISTRADORES CORRETOS
     PUSH AX
     PUSH BX    ;salva os conteudos de AX e BX
@@ -575,15 +538,7 @@ PT1:
     ;until
     JNZ TOPO      ;fecha o loop repeat
     POP BX
-    POP AX    
-    ;restaura os conteudos de BX e AX
-
-NegativeNumber_3:
-        ; write caratcer
-        MOV AH,2
-	    MOV DL, "-"
-	    INT 21H
-        RET
+    POP AX          ;restaura os conteudos de BX e AX
 
 mulFunction ENDP
 
@@ -610,21 +565,6 @@ divFunction PROC
     MOV AH, 09
     LEA DX, OPT
     INT 21h
-
-    ;verify number is negative
-    TEST BL, 80h
-    JNZ NegativeNumber_4
-
-    ;verify number is negative
-    TEST CL, 80h
-    JNZ NegativeNumber_4
-
-NegativeNumber_4:
-        ; write caratcer
-        MOV AH,2
-	    MOV DL, "-"
-	    INT 21H
-        RET
 
 divFunction ENDP
 
