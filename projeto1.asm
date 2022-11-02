@@ -1,7 +1,5 @@
 ; TO DO LIST
-; Print Negativo na Subtração
-; MUL -> Necessario Terminar
-; DIV
+; Fazer o DIV
 
 TITLE Alcides_19060987_PedroTrevisan_18016568
 .MODEL SMALL
@@ -452,11 +450,15 @@ subFunction PROC
 	MOV DL, "="
 	INT 21H
 
+    TEST BL, 80h
+    JNZ Negative_Print
+
     ; Function used to print always 2 digits
     call printNum
 
     ; NEED to print Negative Values
 
+Back_Menu:
     NewLine
 
     MOV AH, 09
@@ -468,10 +470,21 @@ subFunction PROC
 
     call introPrint
 
+Negative_Print:
+    MOV AH, 02
+    MOV DL, "-"
+    INT 21h
+
+    NEG BL
+
+    call printNum
+
+    call Back_Menu
+
 subFunction ENDP
 
 ;Function Name: mulFunction
-;Description: Funtion used to do the mul operation
+;Description: Funtion used to do the MUL operation
 ;Register used: BX = A, CX = B, DX = A*B
 mulFunction PROC
 
@@ -557,6 +570,9 @@ DESLOC_MUL:
 
 mulFunction ENDP
 
+;Function Name: divFunction
+;Description: Funtion used to do the DIV operation
+;Register used: BX = A, CX = B, DX = A*B
 divFunction PROC
 
     NewLine
@@ -600,28 +616,12 @@ divFunction PROC
     MOV AL, BL
     MOV BL, CL
 
+
     ; Necessario zerar a parte alta, já que só estamos usando a parte baixa e pode conter algum lixo
     XOR AH, AH
     XOR BH, BH
-    AND DX,0    ;inicializa DX em 0
 
-DIV_SUB:   
-    TEST BX,1 
-    JZ DESLOC_DIV 
-    ;then
-    SUB DX,AX 
-    ;end_if
-DESLOC_DIV:    
-    SHR AX,1        
-    SHL BX,1       
-    ;until
-    JNZ DIV_SUB      ;fecha o loop repeat
-
-    MOV BX, DX
-
-    MOV AH,2
-	MOV DL, "="
-	INT 21H
+    ; NECESSARIO FAZER A DIV
 
     ; Function used to print always 2 digits
     call printNum
