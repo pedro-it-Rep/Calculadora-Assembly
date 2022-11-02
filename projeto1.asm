@@ -266,7 +266,7 @@ readN1 PROC
     MOV AH, 1
     INT 21H
 
-;verify number is less than 0
+    ;verify number is less than 0
     CMP AL, 30h
     JB ErrorN1
 
@@ -574,6 +574,10 @@ printNum PROC
     MOV BL, 10
     DIV BL
     MOV BX, AX
+
+    TEST BX, 80h
+    JNZ Negative_Number
+
     MOV DL, BL
     OR DL, 30h
     MOV AH,2
@@ -584,6 +588,12 @@ printNum PROC
     INT 21h
 
     RET
+Negative_Number:
+    MOV AH, 02
+    MOV DL, "-"
+    INT 21h
+    RET
+
 printNum ENDP
 
 End MAIN
