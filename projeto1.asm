@@ -318,6 +318,27 @@ ErrorN2:
     JMP readN2
 
 readN2 ENDP
+
+;Function Name: printNum
+;Description: Funtion used to print two digits as result
+;Register used: 
+printNum PROC
+    MOV AX, BX
+    XOR BH, BH
+    MOV BL, 10
+    DIV BL
+    MOV BX, AX
+    MOV DL, BL
+    OR DL, 30h
+    MOV AH,2
+    INT 21H
+    MOV DL, BH
+    OR DL, 30h
+    MOV AH, 2
+    INT 21h
+
+    RET
+printNum ENDP
 ; ----------------------------------------------------------------- Commom Functions -----------------------------------------------------
 
 ; ----------------------------------------------------------------- Math Functions -----------------------------------------------------
@@ -369,7 +390,7 @@ addFunction PROC
 	INT 21H
 
     ; Function used to print always 2 digits
-    JMP printNum
+    call printNum
 
     NewLine
 
@@ -380,7 +401,7 @@ addFunction PROC
     MOV AH, 1
     INT 21H
 
-    JMP introPrint
+    call introPrint
 
 addFunction ENDP
 
@@ -432,7 +453,7 @@ subFunction PROC
 	INT 21H
 
     ; Function used to print always 2 digits
-    JMP printNum
+    call printNum
 
     ; NEED to print Negative Values
 
@@ -445,7 +466,7 @@ subFunction PROC
     MOV AH, 1
     INT 21H
 
-    JMP introPrint
+    call introPrint
 
 subFunction ENDP
 
@@ -476,31 +497,69 @@ mulFunction PROC
     LEA DX, OPT
     INT 21h
 
-; AINDA NÃO ESTÁ PRONTO, NECESSARIO TERMINAR DE COLOCAR OS REGISTRADORES CORRETOS
-    PUSH AX
-    PUSH BX    ;salva os conteudos de AX e BX
+    MOV AH, 2
+    MOV DL, BL
+    INT 21H
+
+    MOV AH,2
+	MOV DL, "*"
+	INT 21H
+    
+    MOV AH, 2
+    MOV DL, CL
+    INT 21H
+
+    SUB BL, 30h
+    SUB CL, 30h
+
+    ; Necessario trocar para o AL e BL, pois CX é um contador
+    MOV AL, BL
+    MOV BL, CL
+
+    ; Necessario zerar a parte alta, já que só estamos usando a parte baixa e pode conter algum lixo
+    XOR AH, AH
+    XOR BH, BH
     AND DX,0    ;inicializa DX em 0
-    ;repeat  if B eh impar
-TOPO:   
+
+MUL_ADD:   
     TEST BX,1 ;LSB de BX = 1?
-    JZ PT1       ;nao, (LSB = 0)
+    JZ DESLOC_MUL       ;nao, (LSB = 0)
     ;then
     ADD DX,AX   ;sim, entao
     ;produto = produto + A
     ;end_if
-PT1:    
+DESLOC_MUL:    
     SHL AX,1        ;desloca A para a esquerda 1 bit
     SHR BX,1       ;desloca B para a direita 1 bit
     ;until
-    JNZ TOPO      ;fecha o loop repeat
-    POP BX
-    POP AX          ;restaura os conteudos de BX e AX
+    JNZ MUL_ADD      ;fecha o loop repeat
+
+    MOV BX, DX
+
+    MOV AH,2
+	MOV DL, "="
+	INT 21H
+
+    ; Function used to print always 2 digits
+    call printNum
+
+    NewLine
+
+    MOV AH, 09
+    LEA DX, BACKINTRO
+    INT 21h
+
+    MOV AH, 1
+    INT 21H
+
+    call introPrint
+
 
 mulFunction ENDP
 
 divFunction PROC
 
-     NewLine
+    NewLine
 
     ; display message
     MOV AH, 09
@@ -522,24 +581,62 @@ divFunction PROC
     LEA DX, OPT
     INT 21h
 
-divFunction ENDP
-
-;description
-printNum PROC
-    MOV AX, BX
-    MOV BL, 10
-    DIV BL
-    MOV BX, AX
-    MOV DL, BL
-    OR DL, 30h
-    MOV AH,2
-    INT 21H
-    MOV DL, BH
-    OR DL, 30h
     MOV AH, 2
+    MOV DL, BL
+    INT 21H
+
+    MOV AH,2
+	MOV DL, "/"
+	INT 21H
+    
+    MOV AH, 2
+    MOV DL, CL
+    INT 21H
+
+    SUB BL, 30h
+    SUB CL, 30h
+
+    ; Necessario trocar para o AL e BL, pois CX é um contador
+    MOV AL, BL
+    MOV BL, CL
+
+    ; Necessario zerar a parte alta, já que só estamos usando a parte baixa e pode conter algum lixo
+    XOR AH, AH
+    XOR BH, BH
+    AND DX,0    ;inicializa DX em 0
+
+DIV_SUB:   
+    TEST BX,1 
+    JZ DESLOC_DIV 
+    ;then
+    SUB DX,AX 
+    ;end_if
+DESLOC_DIV:    
+    SHR AX,1        
+    SHL BX,1       
+    ;until
+    JNZ DIV_SUB      ;fecha o loop repeat
+
+    MOV BX, DX
+
+    MOV AH,2
+	MOV DL, "="
+	INT 21H
+
+    ; Function used to print always 2 digits
+    call printNum
+
+    NewLine
+
+    MOV AH, 09
+    LEA DX, BACKINTRO
     INT 21h
 
-    RET
-printNum ENDP
+    MOV AH, 1
+    INT 21H
+
+    call introPrint
+
+divFunction ENDP
 
 End MAIN
