@@ -621,6 +621,28 @@ divFunction PROC
     XOR AH, AH
     XOR BH, BH
 
+    AND CX,0    ;inicializa DX em 0
+
+DIV_SUB:   
+    TEST BX,1 ;LSB de BX = 1?
+    JZ DESLOC_DIV       ;nao, (LSB = 0)
+    ;then
+    SUB DX,AX   ;sim, entao
+    ;produto = produto + A
+    ;end_if
+DESLOC_DIV:    
+    SHR AX,1        ;desloca A para a esquerda 1 bit
+    SHL BX,1       ;desloca B para a direita 1 bit
+    ;until
+    JNZ DIV_SUB      ;fecha o loop repeat
+
+    MOV BX, DX
+
+    MOV AH,2
+	MOV DL, "="
+	INT 21H
+
+
     ; NECESSARIO FAZER A DIV
 
     ; Function used to print always 2 digits
