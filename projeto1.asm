@@ -30,6 +30,8 @@ TITLE Alcides_19060987_PedroTrevisan_18016568
     BACKINTRO   DB "Pressione ENTER para Contiuar $"
 
     OPT         DB "Operacao -> $"
+    QUODIV      DB "Quociente -> $"
+    REMDIV      DB "Resto -> $"
 
     ;Errors Messages
     INVOPT      DB "Opcao Invalida. Tente Novamente $"
@@ -37,10 +39,12 @@ TITLE Alcides_19060987_PedroTrevisan_18016568
 
 .CODE
 
-; -------------------------------------------------------------------- MACROS -----------------------------------------------------
-
+; ----------------------------------------------------- MACROS ---------------------------------------------------------------
+;Function Name: NewLine (MACRO)
+;Description: Funtion used only to jump to next line
+;Register used: None
 NewLine MACRO
-    ; to start beginning next line
+    ; to jump to next line
     MOV DL, 10 
     MOV AH, 02h 
     INT 21h
@@ -49,6 +53,9 @@ NewLine MACRO
     INT 21h
 ENDM
 
+;Function Name: CLICALL (MACRO)
+;Description: Funtion used only to print ">" char just to make the program fancy
+;Register used: None
 CLICALL MACRO
     ;display caracter
     MOV AH, 09
@@ -56,9 +63,9 @@ CLICALL MACRO
     INT 21h
 ENDM
 
-; -------------------------------------------------------------------- MACROS -----------------------------------------------------
+; ----------------------------------------------------- MACROS ---------------------------------------------------------------
 
-; ----------------------------------------------------------------- MAIN PROC -----------------------------------------------------
+; ----------------------------------------------------- MAIN PROC ------------------------------------------------------------
 
 MAIN PROC
 
@@ -75,7 +82,7 @@ FIM:
     INT 21H
 MAIN ENDP
 
-; ----------------------------------------------------------------- Functions -----------------------------------------------------
+; ----------------------------------------------------- Functions ------------------------------------------------------------
 
 ;Function Name: introPrint
 ;Description: Funtion used only to print the program intro header
@@ -86,70 +93,60 @@ introPrint PROC
     MOV AX,3H			
 	INT 10H	
 
-    ;display message
     MOV AH, 09
     LEA DX, BOUNDUP
     INT 21h
 
     NewLine
-
-    ;display message
+    
     MOV AH, 09
     LEA DX, TITULO
     INT 21h
 
     NewLine
 
-    ;display message
     MOV AH, 09
     LEA DX, COMPS
     INT 21h
 
     NewLine
-
-    ;display message
+    
     MOV AH, 09
     LEA DX, DIGITE
     INT 21h
 
     NewLine
 
-    ;display message
     MOV AH, 09
     LEA DX, CMDSOMA
     INT 21h
 
     NewLine
 
-    ;display message
     MOV AH, 09
     LEA DX, CMDSUB
     INT 21h
 
     NewLine
 
-    ;display message
     MOV AH, 09
     LEA DX, CMDMUL
     INT 21h
 
     NewLine
-
-    ;display message
+    
     MOV AH, 09
     LEA DX, CMDDIV
     INT 21h
 
     NewLine
 
-    ;display message
     MOV AH, 09
     LEA DX, CMDEND
     INT 21h
 
     NewLine
 
-    ;display message
     MOV AH, 09
     LEA DX, BOUNDDOWN
     INT 21h
@@ -215,41 +212,51 @@ receiveCheckOpt PROC
     JMP receiveCheckOpt
 receiveCheckOpt ENDP
 
-; ----------------------------------------------------------------- Extend Functions -----------------------------------------------------
-;Just Extend the JMP for the end Statement
+; ----------------------------------------------------- Extend Functions -----------------------------------------------------
+;Function Name: extEnd
+;Description: Just Extend the JMP for the end Procediment
+;Register used: None
 extEnd PROC
     JMP FIM
 extEnd ENDP
 
+;Function Name: extADD
+;Description: Just Extend the JMP for the ADD Procediment
+;Register used: None
 extADD PROC
     JMP addFunction
 extADD ENDP
 
+;Function Name: extSUB
+;Description: Just Extend the JMP for the SUB Procediment
+;Register used: None
 extSUB PROC
     JMP subFunction
 extSUB ENDP
 
+;Function Name: extMUL
+;Description: Just Extend the JMP for the MUL Procediment
+;Register used: None
 extMUL PROC
     JMP mulFunction
 extMUL ENDP
 
+;Function Name: extDIV
+;Description: Just Extend the JMP for the DIV Procediment
+;Register used: None
 extDIV PROC
     JMP divFunction
 extDIV ENDP
-
-extcheckNumber PROC
-    ;CMP AL, 0
-    ;JA checkNumberFuncion
-extcheckNumber ENDP
 
 ; ----------------------------------------------------------------- Extend Functions -----------------------------------------------------
 
 ; ----------------------------------------------------------------- Commom Functions -----------------------------------------------------
 ;Function Name: readN1
-;Description: Funtion used read the first number that we gonna used on the operation
+;Description: Funtion used to read the first number that we gonna used on the operation
 ;Register used: BL used for store the number read
 readN1 PROC
 
+    ; Print message to indicate to user what he/she needs to do
     MOV AH, 09
     LEA DX, N1SELECT
     INT 21h
@@ -261,9 +268,11 @@ readN1 PROC
     MOV AH, 1
     INT 21H
 
+    ; If the char read it's < 0, print error because we don't support it
     CMP AL, 30h
     JB ErrorN1
 
+    ; If the char read it's > 9, print error because we don't support it
     CMP AL, 39h
     JA ErrorN1
 
@@ -286,6 +295,7 @@ readN1 ENDP
 ;Register used: CL used for store the number read
 readN2 PROC
 
+    ; Print message to indicate to user what he/she needs to do
     MOV AH, 09
     LEA DX, N2SELECT
     INT 21h
@@ -297,9 +307,11 @@ readN2 PROC
     MOV AH, 1
     INT 21H
 
+    ; If the char read it's < 0, print error because we don't support it
     CMP AL, 30h
     JB ErrorN2
 
+    ; If the char read it's > 9, print error because we don't support it
     CMP AL, 39h
     JA ErrorN2
 
@@ -319,9 +331,9 @@ readN2 ENDP
 
 ;Function Name: printNum
 ;Description: Funtion used to print two digits as result
-;Register used: 
+;Register used: None
 printNum PROC
-    MOV AX, BX
+    MOV AX, BX ; The result of most of our Maths are in BX, and because se gonna use it, save the result in AX
     XOR BH, BH
     MOV BL, 10
     DIV BL
@@ -337,12 +349,69 @@ printNum PROC
 
     RET
 printNum ENDP
+
+;Function Name: printNumDIV
+;Description: Funtion used to print the result of the Division
+;Register used: None
+printNumDIV PROC
+    ; Necessary to use the Stack because our Quotient is in CX and the Remainder is in AX
+    POP SI ; Save the return END, so we can back to the function that call it
+    POP CX ; Get Quotient Value from Stack
+
+    ; Print message only for indicate what is this number
+    MOV AH, 09
+    LEA DX, QUODIV
+    INT 21h
+
+    ; Print quotient with two digits
+    MOV AX, CX
+    XOR BH, BH
+    MOV BL, 10
+    DIV BL
+    MOV BX, AX
+    MOV DL, BL
+    OR DL, 30h
+    MOV AH,2
+    INT 21H
+    MOV DL, BH
+    OR DL, 30h
+    MOV AH, 2
+    INT 21h
+
+    NewLine
+
+    ; Print message only for indicate what is this number
+    MOV AH, 09
+    LEA DX, REMDIV
+    INT 21h
+
+    POP AX ; Get the Remainder value from Stack
+
+    ; Print Remainder with two digits
+    XOR BH, BH
+    MOV BL, 10
+    DIV BL
+    MOV BX, AX
+    MOV DL, BL
+    OR DL, 30h
+    MOV AH,2
+    INT 21H
+    MOV DL, BH
+    OR DL, 30h
+    MOV AH, 2
+    INT 21h
+
+    ; Restore the Caller END in Stack for go back to the function that call it
+    PUSH SI
+
+    RET
+printNumDIV ENDP
 ; ----------------------------------------------------------------- Commom Functions -----------------------------------------------------
 
 ; ----------------------------------------------------------------- Math Functions -----------------------------------------------------
 ;Function Name: addFunction
 ;Description: Funtion used to do the sum
-;Register used: BL as First Input and CL as Second Input
+;Register used: BL as First Input (obtained from readN1) and CL as Second Input (obtained from readN2)
 addFunction PROC
 
     NewLine
@@ -354,6 +423,7 @@ addFunction PROC
     
     NewLine
 
+    ; Call functions to read the values that we gonna use to do the operation
     call readN1
 
     NewLine
@@ -362,6 +432,7 @@ addFunction PROC
 
     NewLine
 
+    ; Print the operation that user whats to do
     MOV AH, 09
     LEA DX, OPT
     INT 21h
@@ -378,6 +449,7 @@ addFunction PROC
     MOV DL, CL
     INT 21H
     
+    ; Get the real value, and not the char value
     SUB BL, 30h
     SUB CL, 30h
 
@@ -392,31 +464,35 @@ addFunction PROC
 
     NewLine
 
+    ; Message to indicate how to turn back to the menu
     MOV AH, 09
     LEA DX, BACKINTRO
     INT 21h
 
+    ; Waits for a ENTER
     MOV AH, 1
     INT 21H
 
+    ; Back to Menu
     call introPrint
 
 addFunction ENDP
 
 ;Function Name: subFunction
 ;Description: Funtion used to do the subtraction
-;Register used: BL as First Input and CL as Second Input
+;Register used: BL as First Input (obtained from readN1) and CL as Second Input (obtained from readN2)
 subFunction PROC
 
     NewLine
 
-    ; display message
+    ; Print Msg for the operation selected
     MOV AH, 09
     LEA DX, SUBSELECT
     INT 21h
     
     NewLine
 
+    ; Call functions to read the values that we gonna use to do the operation
     call readN1
 
     NewLine
@@ -425,7 +501,7 @@ subFunction PROC
 
     NewLine
 
-    ;display message
+    ; Print the operation that user whats to do
     MOV AH, 09
     LEA DX, OPT
     INT 21h
@@ -442,39 +518,46 @@ subFunction PROC
     MOV DL, CL
     INT 21H
     
+    ; Get the real value, and not the char value
     SUB BL, 30h
     SUB CL, 30h
+
     SUB BL, CL
     
     MOV AH,2
 	MOV DL, "="
 	INT 21H
 
+;   IF BL < 0
+    ; Check if the result it's negative, if it's we need to print the "-" char before print the number
     TEST BL, 80h
     JNZ Negative_Print
-
-    ; Function used to print always 2 digits
+;   ELSE
+    ; If we call the function here, so the number it's not negative
     call printNum
-
-    ; NEED to print Negative Values
 
 Back_Menu:
     NewLine
 
+    ; Message to indicate how to turn back to the menu
     MOV AH, 09
     LEA DX, BACKINTRO
     INT 21h
 
+    ; Waits for a ENTER
     MOV AH, 1
     INT 21H
 
+    ; Back to Menu
     call introPrint
 
 Negative_Print:
+    ; Result of the operation is negative, print the "-" char
     MOV AH, 02
     MOV DL, "-"
     INT 21h
 
+    ; Necessary to get the C2 number
     NEG BL
 
     call printNum
@@ -485,18 +568,19 @@ subFunction ENDP
 
 ;Function Name: mulFunction
 ;Description: Funtion used to do the MUL operation
-;Register used: BX = A, CX = B, DX = A*B
+;Register used: BL as First Input (obtained from readN1), CL as Second Input (obtained from readN2) and DX for the result of the operation (DX = BL * CL)
 mulFunction PROC
 
     NewLine
 
-    ; display message
+    ; Print Msg for the operation selected
     MOV AH, 09
     LEA DX, MULSELECT
     INT 21h
     
     NewLine
 
+    ; Call functions to read the values that we gonna use to do the operation
     call readN1
 
     NewLine
@@ -505,7 +589,7 @@ mulFunction PROC
 
     NewLine
 
-    ;display message
+    ; Print the operation that user whats to do
     MOV AH, 09
     LEA DX, OPT
     INT 21h
@@ -522,31 +606,33 @@ mulFunction PROC
     MOV DL, CL
     INT 21H
 
+    ; Get the real value, and not the char value
     SUB BL, 30h
     SUB CL, 30h
 
-    ; Necessario trocar para o AL e BL, pois CX é um contador
+    ; Change to AL and BL just to make sure that any counter gonna cause some trouble
     MOV AL, BL
     MOV BL, CL
 
-    ; Necessario zerar a parte alta, já que só estamos usando a parte baixa e pode conter algum lixo
+    ; Because we are only using the LOW Register, we need to clean the HIGH Register to make sure that we don't have any trash
     XOR AH, AH
     XOR BH, BH
-    AND DX,0    ;inicializa DX em 0
+    AND DX,0    ; Initialize DX with 0
 
-MUL_ADD:   
-    TEST BX,1 ;LSB de BX = 1?
-    JZ DESLOC_MUL       ;nao, (LSB = 0)
-    ;then
-    ADD DX,AX   ;sim, entao
-    ;produto = produto + A
-    ;end_if
+MUL_ADD:
+;   IF LSB = 1
+    TEST BX,1 ; LSB BX = 1? (LSB = Less Significant Byte)
+    JZ DESLOC_MUL       ; No, LSB = 0
+;   THEN
+    ADD DX,AX ; DX = DX + AX (PROD = PROD + AX)
+;   END IF
 DESLOC_MUL:    
-    SHL AX,1        ;desloca A para a esquerda 1 bit
-    SHR BX,1       ;desloca B para a direita 1 bit
-    ;until
-    JNZ MUL_ADD      ;fecha o loop repeat
+    SHL AX,1        ;Shift left 1 bit
+    SHR BX,1        ;Shift right 1 bit
 
+    JNZ MUL_ADD
+
+    ; Save the result in BX to print
     MOV BX, DX
 
     MOV AH,2
@@ -558,32 +644,35 @@ DESLOC_MUL:
 
     NewLine
 
+    ; Message to indicate how to turn back to the menu
     MOV AH, 09
     LEA DX, BACKINTRO
     INT 21h
 
+    ; Waits for a ENTER
     MOV AH, 1
     INT 21H
 
+    ; Back to Menu
     call introPrint
-
 
 mulFunction ENDP
 
 ;Function Name: divFunction
 ;Description: Funtion used to do the DIV operation
-;Register used: BX = A, CX = B, DX = A*B
+;Register used: CX divided by DX and the result is Quotient saves in CX and Reminder saves in AX
 divFunction PROC
 
     NewLine
 
-    ; display message
+    ; Print Msg for the operation selected
     MOV AH, 09
     LEA DX, DIVSELECT
     INT 21h
     
     NewLine
 
+    ; Call functions to read the values that we gonna use to do the operation
     call readN1
 
     NewLine
@@ -592,7 +681,7 @@ divFunction PROC
 
     NewLine
 
-    ;display message
+    ; Print the operation that user whats to do
     MOV AH, 09
     LEA DX, OPT
     INT 21h
@@ -609,32 +698,54 @@ divFunction PROC
     MOV DL, CL
     INT 21H
 
+    ; Get the real value, and not the char value
     SUB BL, 30h
     SUB CL, 30h
 
-    ; Necessario trocar para o AL e BL, pois CX é um contador
-    MOV AL, BL
-    MOV BL, CL
-
-
-    ; Necessario zerar a parte alta, já que só estamos usando a parte baixa e pode conter algum lixo
-    XOR AH, AH
+    ; Because we are only using the LOW Register, we need to clean the HIGH Register to make sure that we don't have any trash
     XOR BH, BH
+    XOR CH, CH
 
-    ; NECESSARIO FAZER A DIV
+    ; Save the value BX value in CX and the CX value in DX for do the operation later
+    MOV DX, CX
+    MOV CX, BX
 
-    ; Function used to print always 2 digits
-    call printNum
+    ; Clean make sure that we don't have any trash
+    MOV AX, 0
+    MOV BP, 10H
+
+DIV_SUB:  
+    SAL CX, 1
+    RCL AX, 1
+    CMP AX, DX
+    JB  CHECK_QUO_REM
+    SUB AX, DX
+    INC CX
+
+CHECK_QUO_REM: 
+    DEC BP
+    JNZ DIV_SUB
+
+    PUSH AX
+    PUSH CX
 
     NewLine
 
+    ; Function used to print the Quotiente and the Reminder with two digits
+    call printNumDIV
+
+    NewLine
+
+    ; Message to indicate how to turn back to the menu
     MOV AH, 09
     LEA DX, BACKINTRO
     INT 21h
 
+    ; Waits for a ENTER
     MOV AH, 1
     INT 21H
 
+    ; Back to Menu
     call introPrint
 
 divFunction ENDP
