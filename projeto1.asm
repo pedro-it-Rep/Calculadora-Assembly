@@ -1,6 +1,3 @@
-; TO DO LIST
-; Fazer o DIV
-
 TITLE Alcides_19060987_PedroTrevisan_18016568
 .MODEL SMALL
 .STACK 100H
@@ -27,7 +24,7 @@ TITLE Alcides_19060987_PedroTrevisan_18016568
     DIVSELECT   DB "Funcao de Divisao Selecionada $"
     N1SELECT    DB "Selecione o primeiro numero (0 - 9) $"
     N2SELECT    DB "Selecione o segundo numero (0 - 9) $"
-    BACKINTRO   DB "Pressione ENTER para Contiuar $"
+    BACKINTRO   DB "Pressione ENTER para Continuar $"
 
     OPT         DB "Operacao -> $"
     QUODIV      DB "Quociente -> $"
@@ -36,6 +33,7 @@ TITLE Alcides_19060987_PedroTrevisan_18016568
     ;Errors Messages
     INVOPT      DB "Opcao Invalida. Tente Novamente $"
     INVINPT     DB "Entrada Invalida. Tente Novamente $"
+    DIV_0       DB "Operacao Invalida. Nao eh possivel dividir por 0 $"
 
 .CODE
 
@@ -698,6 +696,9 @@ divFunction PROC
     MOV DL, CL
     INT 21H
 
+    CMP CL, 30h
+    JE DIV0_ERROR
+
     ; Get the real value, and not the char value
     SUB BL, 30h
     SUB CL, 30h
@@ -733,6 +734,27 @@ CHECK_QUO_REM:
 
     ; Function used to print the Quotiente and the Reminder with two digits
     call printNumDIV
+
+    NewLine
+
+    ; Message to indicate how to turn back to the menu
+    MOV AH, 09
+    LEA DX, BACKINTRO
+    INT 21h
+
+    ; Waits for a ENTER
+    MOV AH, 1
+    INT 21H
+
+    ; Back to Menu
+    call introPrint
+
+DIV0_ERROR:
+    NewLine
+
+    MOV AH, 09
+    LEA DX, DIV_0
+    INT 21h
 
     NewLine
 
