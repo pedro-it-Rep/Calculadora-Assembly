@@ -72,8 +72,6 @@ MAIN PROC
 
     call introPrint
 
-    call receiveCheckOpt
-
 ; End of program
 FIM:
     MOV AH, 4CH ;retorna ao programa
@@ -151,7 +149,8 @@ introPrint PROC
 
     NewLine
 
-    RET
+    call receiveCheckOpt
+    
 introPrint ENDP
 
 ;Function Name: receiveCheckOpt
