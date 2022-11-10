@@ -200,6 +200,7 @@ receiveCheckOpt PROC
     JE extEnd
 
     ; Invalid Option Insert -> Print error and ask for it again
+    NewLine
     MOV AH, 09
     LEA DX, INVOPT
     INT 21h
@@ -330,6 +331,7 @@ readN2 ENDP
 ;Description: Funtion used to print two digits as result
 ;Register used: None
 printNum PROC
+    XOR AX, AX
     MOV AX, BX ; The result of most of our Maths are in BX, and because se gonna use it, save the result in AX
     XOR BH, BH
     MOV BL, 10
@@ -413,6 +415,9 @@ addFunction PROC
 
     NewLine
 
+    XOR BX, BX
+    XOR CX, CX
+
     ; Print Msg for the operation selected
     MOV AH, 09
     LEA DX, ADDSELECT
@@ -481,6 +486,9 @@ addFunction ENDP
 subFunction PROC
 
     NewLine
+
+    XOR BX, BX
+    XOR CX, CX
 
     ; Print Msg for the operation selected
     MOV AH, 09
@@ -569,6 +577,9 @@ subFunction ENDP
 mulFunction PROC
 
     NewLine
+
+    XOR BX, BX
+    XOR CX, CX
 
     ; Print Msg for the operation selected
     MOV AH, 09
@@ -661,6 +672,9 @@ mulFunction ENDP
 divFunction PROC
 
     NewLine
+
+    XOR BX, BX
+    XOR CX, CX
 
     ; Print Msg for the operation selected
     MOV AH, 09
